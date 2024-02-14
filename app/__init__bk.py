@@ -1,0 +1,175 @@
+import base64
+from datetime import date
+import os
+from flask import Flask, Response, redirect, session, url_for, render_template, request
+from flask_migrate import Migrate
+from flask_wtf.csrf import CSRFProtect
+from app.config import config
+from app.controllers.C_Doctors import C_Doctors
+from app.controllers.C_IA_Trainer import CustomSVM
+from app.controllers.C_IA_Trainerbk import C_IA_Trainer
+from app.controllers.C_Login import C_Login
+from app.controllers.C_Maintenance import C_Maintenance
+from app.controllers.C_People import C_People
+from app.controllers.C_Pharma import C_Pharma
+from app.controllers.C_Users import C_Users
+from app.models.Models import People, Users, db
+from flask_socketio import SocketIO
+from queue import Queue
+from threading import Thread
+
+import cv2
+import dlib
+import numpy as np
+
+csrf = CSRFProtect()
+
+
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(config)
+    migrate = Migrate(app, db)
+    socketio = SocketIO(app)
+    login = C_Login
+    users = C_Users
+    people = C_People
+    doctors = C_Doctors
+    ia = C_IA_Trainer
+    pharma = C_Pharma
+    maintenance = C_Maintenance
+    db.init_app(app)
+    migrate.init_app(app)
+    csrf.init_app(app)
+    app.register_blueprint(login.login)
+    app.register_blueprint(users.usuarios)
+    app.register_blueprint(people.peop)
+    app.register_blueprint(ia.ia)
+    app.register_blueprint(doctors.doctors)
+    app.register_blueprint(pharma.pharma)
+    app.register_blueprint(maintenance.maint)
+    face_detector = dlib.get_frontal_face_detector()
+    camera = cv2.VideoCapture(0)
+
+    @app.template_filter()
+    def imagen_a_base64(ruta_imagen):
+        with open(ruta_imagen, "rb") as imagen_archivo:
+            imagen_bytes = imagen_archivo.read()
+            imagen_base64 = base64.b64encode(imagen_bytes).decode("utf-8")
+        return imagen_base64
+
+    app.jinja_env.filters['base64'] = imagen_a_base64
+
+    @app.template_filter()
+    def calcular_edad(fecha_nacimiento):
+        fecha_hoy = date.today()
+        diferencia_de_anios = fecha_hoy.year - fecha_nacimiento.year
+
+        if fecha_hoy < fecha_nacimiento:
+            edad = diferencia_de_anios - 1
+        else:
+            edad = diferencia_de_anios
+
+        if fecha_hoy.month < fecha_nacimiento.month:
+            edad = edad - 1
+        elif fecha_hoy.day < fecha_nacimiento.day:
+            edad = edad - 1
+        return edad
+
+    app.jinja_env.filters['base64'] = calcular_edad
+
+    @app.route('/logout')
+    def logout():
+        session.clear()
+        return redirect(url_for('login.index'))
+
+    def process_frames(queue):
+        predictor = dlib.shape_predictor("shape_predictor_68_face_landmarks.dat")
+
+        while True:
+            frame = queue.get()
+            gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+            faces = face_detector(gray_frame)
+            for face in faces:
+                x, y, w, h = face.left(), face.top(), face.width(), face.height()
+
+                cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+
+                roi = frame[y:y+h, x:x+w]
+
+                gray_webcam_img = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                faces = face_detector(gray_webcam_img)
+
+                if not faces:
+                    print("No se detectaron caras frente a la cámara")
+                    continue
+
+                face = faces[0]
+                shape = predictor(gray_webcam_img, face)
+
+                x, y, w, h = shape.rect.left() - 15, shape.rect.top() - 15, shape.rect.width() + 30, shape.rect.height() + 30
+                x, y = max(x, 0), max(y, 0)
+
+                cropped_webcam_img = frame[y:y+h, x:x+w]
+
+                custom_svm = CustomSVM()
+                custom_svm.load_model('model_weights.joblib')
+
+                prediction = custom_svm.predict(cropped_webcam_img)
+
+                if prediction == "unknown":
+                    print("Persona desconocida")
+                    socketio.emit('recognized', {'label': "desconocido"})
+                else:
+                    with app.app_context():
+                        person_data = People.query.filter_by(peop_dni=prediction).first()
+
+                    print(f"Persona identificada: {person_data.peop_lastnames}")
+                    camera.release()
+                    socketio.emit('recognized', {'label': prediction})
+
+    def generate_frames():
+        queue = Queue()
+
+        process_thread = Thread(target=process_frames, args=(queue,))
+        process_thread.daemon = True
+        process_thread.start()
+
+        while True:
+            success, frame = camera.read()
+            if not success:
+                break
+
+            queue.put(frame)
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+
+        camera.release()
+
+    @app.route('/video_feed')
+    def video_feed():
+        return Response(generate_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
+
+    @app.route('/capture')
+    def capture():
+        camera = cv2.VideoCapture(0)
+        success, frame = camera.read()
+        if success:
+            filename = 'captured_photo.jpg'
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            cv2.imwrite(filepath, frame)
+            camera.release()
+            return f'Captura exitosa. Imagen guardada como {filename} en {app.config["UPLOAD_FOLDER"]}'
+        else:
+            camera.release()
+            return 'Error al capturar la imagen'
+
+    return app, socketio
+
+if __name__ == '__main__':
+    app, socketio = create_app()
+    socketio.run(app, port=5000, debug=True)

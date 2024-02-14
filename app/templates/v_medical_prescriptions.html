@@ -1,0 +1,343 @@
+{% extends 'v_master.html' %}
+
+{% block content %}
+<div class="modal fade" id="mdlBuscarPersona" aria-hidden="true" aria-labelledby="mdlBuscarPersonaLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlBuscarPersonaLabel">
+                    Buscar Persona
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmBusqPers">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtCedulaBusqPersona(class="form-control form-control-sm") }}
+                                <label for="txtCedulaBusqPersona">Cédula</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtNombBusqPersona(class="form-control form-control-sm") }}
+                                <label for="txtNombBusqPersona">Nombres</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtApellidosBusqPersona(class="form-control form-control-sm") }}
+                                <label for="txtApellidosBusqPersona">Apellidos</label>
+                            </div>
+                        </div>
+                        {{ formBusq.hidden_tag() }}
+                        <div class="col-md-12 mb-3">
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="btnBusqPersona" id="btnBusqPersona" class="btn btn-primary">
+                                    Buscar Persona
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-secondary">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Persona</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listPersonas">
+                                <tr class="">
+                                    <td colspan="3" class="text-center">
+                                        <h5>Ingrese los datos para realizar la busqueda</h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-target="#mdlNuevoUsuario" data-bs-toggle="modal">
+                    Volver al Formulario Anterior
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ title }}</h4>
+                <form id="frmBusqPersona">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <div class="d-grid gap-2">
+                                    <button type="button" name="" id="" class="btn btn-primary" data-bs-toggle="modal"
+                                        data-bs-target="#mdlBuscarPersona">
+                                        <i class="fa fa-search" aria-hidden="true"></i> Buscar Persona Manualmente
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </form>
+                <form id="frmEntrega">
+                    <div class="row">
+                        <div class="col-md-6 mb-3" id="div-image">
+                            <img class="img-fluid" id="webcam-stream" src="{{ url_for('video_feed') }}"
+                                alt="Webcam Stream">
+                            <p id="recognized-label"></p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <p>Paciente: <b id="patient">NO IDENTIFICADO</b></p>
+                            <p>Cédula: <b id="patient_dni">S/D</b></p>
+                            <p>Fecha de última consulta: <b id="last_consultation">S/D</b></p>
+                            <p>Médico tratante: <b id="doctor">S/D</b></p>
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table class="table table-primary">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">Medicamento</th>
+                                                <th scope="col">Empaque</th>
+                                                <th scope="col" class="col-2">Cantidad</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="listMedicamentos">
+                                            <tr>
+                                                <td colspan="4">
+                                                    <div class="alert alert-info" role="alert">
+                                                        <h4 class="alert-heading">
+                                                            <i class="fa fa-info-circle"></i>
+                                                            Información
+                                                        </h4>
+                                                        <p>
+                                                            No se han encontrado recetas recientes.
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <button type="submit" class="btn btn-primary w-100" id="btnSubmit">
+                                Procesar Entrega
+                            </button>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="https://cdn.socket.io/4.0.1/socket.io.min.js"></script>
+<script>
+    var frmBusqPers = document.querySelector("#frmBusqPers");
+    frmBusqPers.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmBusqPers);
+        axios.post("{{ url_for('people.search_people' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['error'] != "") {
+                    generarMensajeError(mensajes);
+                }
+                document.getElementById('listPersonas').innerHTML = "<tr><td colspan='3' class='text-center text-danger'><h4 style=''>No se han encontrado personas con los datos ingresados</h4></td></tr>";
+                if (mensajes['correcto'] != "") {
+                    var h = "";
+                    var c = mensajes['correcto'];
+                    for (var i = 0, len = c.length; i < len; i++) {
+                        h += '<tr>';
+                        h += '<td>' + c[i].dni + '</td>';
+                        h += '<td>' + c[i].names + ' ' + c[i].lastname + '</td>';
+                        h += '<td><div class="d-grid gap-2"><button data-bs-target="#mdlNuevoUsuario" data-bs-toggle="modal" type="button" value="' + c[i].id + '/' + c[i].dni + '/' + c[i].names + ' ' + c[i].lastname + '" name="btnSelecPers" id="btnSelecPers" class="btnSelectPers btn btn-primary">Seleccionar</button></div></td>';
+                        h += '</tr>';
+                    };
+                    document.getElementById('listPersonas').innerHTML = h;
+                    var btnSelectPers = document.querySelectorAll(".btnSelectPers");
+                    btnSelectPers.forEach(function (button) {
+                        button.addEventListener('click', (e) => {
+                            var value = button.value.split('/');
+                            var dni = value[1];
+                            getPersonPrescription(dni, true);
+                        });
+                    });
+                }
+            })
+            .catch(function (error) {
+                error
+            })
+    });
+
+
+    // Función para actualizar el contenido de la etiqueta reconocida
+    function updateRecognizedLabel(label) {
+        document.getElementById("recognized-label").innerText = "Persona identificada: " + label;
+    }
+
+    const socket = io.connect('http://localhost:5000');
+    var persona = "";
+
+    // Escuchar eventos desde el servidor
+    socket.on('recognized', function (data) {
+        console.log('Persona reconocida:', data.label);
+        getPersonPrescription(data.label);
+    });
+
+    function getPersonPrescription(data, manual = false) {
+        axios.get("{{ url_for('people.get_person_prescription', people='' ) }}/" + data)
+            .then(function (response) {
+                var r = response.data;
+                if (r[0]['medication']!=null) {
+                    if (r[0]['patient'][0] != "") {
+                        var p = r[0]['patient'][0];
+                        document.getElementById('patient').innerHTML = p.patient;
+                        document.getElementById('patient_dni').innerHTML = p.patient_dni;
+                        document.getElementById('last_consultation').innerHTML = p.last_consultation;
+                        document.getElementById('doctor').innerHTML = p.doctor;
+                        if (r[0]['medication'] != "") {
+                            var m = r[0]['medication'];
+                            var h = "";
+                            var z = "";
+                            axios.get("{{ url_for('maint.get_parcel_types', total='total' ) }}")
+                                .then(function (response) {
+                                    var j = response.data
+                                    for (var t = 0, len = j.length; t < len; t++) {
+                                        z += '<option value="' + j[t].id + '">' + j[t].desc + '</option>';
+                                    };
+                                    for (var i = 0, len = m.length; i < len; i++) {
+                                        h += `
+                                <tr>
+                                    <td>${m[i].medicina}</td>
+                                    <td><div class="mb-3">
+                                        <select
+                                            class="form-select form-select-sm"
+                                            name="sltTipoEmpaque"
+                                            id="sltTipoEmpaque"
+                                        >
+                                        ${z}
+                                        </select>
+                                    </div>
+                                    </td>
+                                    <td>
+                                        <input type="hidden" name="txtMedicina" value="${m[i].id}" required readonly>
+                                        <input class="form-control form-control-sm" type="number" min="0" name="txtCantMedicina" value="0" required>
+                                    </td>
+
+                                </tr>
+                                `;
+                                    };
+                                    document.getElementById('listMedicamentos').innerHTML = h;
+                                })
+                                .catch(function (error) {
+                                    console.log(error)
+                                })
+                            if (manual != false) {
+                                if (r[0]['photo'] != "") {
+                                    var url_photo = "{{ url_for('static', filename='uploads/people_photo') }}";
+                                    document.getElementById('div-image').innerHTML = '<img src="' + url_photo + '/' + r[0]['photo'] + '" class="img-fluid rounded-top" alt="" />';
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    document.getElementById('btnSubmit').setAttribute('disabled', 'disabled');
+                    var url_photo = "{{ url_for('static', filename='img') }}";
+                    document.getElementById('div-image').innerHTML = '<img src="' + url_photo + '/' + r[0]['photo'] + '" class="img-fluid rounded-top" alt="" />';
+                    $.alert({
+                        icon: 'fa fa-info-circle',
+                        title: 'Información',
+                        content: 'No se han encontrado consultas recientes para esta persona',
+                        buttons: {
+                            OK: function () {
+                                document.getElementById('patient').innerHTML = "S/D";
+                                document.getElementById('patient_dni').innerHTML = "S/D";
+                                document.getElementById('last_consultation').innerHTML = "S/D";
+                                document.getElementById('doctor').innerHTML = "S/D";
+                            }
+                        }
+                    })
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+
+    // Función para cambiar el texto del botón al hacer clic
+    function changeButtonText(button) {
+        if (button.innerText === "Entregar") {
+            button.innerText = "Entregando";
+        } else {
+            button.innerText = "Entregar";
+        }
+    }
+
+    var frmEntrega = document.querySelector("#frmEntrega");
+    frmEntrega.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmEntrega);
+        axios.post("{{ url_for('pharma.deliver_medication' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['correcto'] != '') {
+                    $.confirm({
+                        title: 'Correcto',
+                        content: mensajes['correcto'],
+                        type: 'green',
+                        buttons: {
+                            aceptar: {
+                                text: 'Aceptar',
+                                btnClass: 'btn btn-success',
+                                action: function () {
+                                    print_roof_delivery(mensajes['delivered'])
+                                }
+                            }
+                        }
+                    });
+                }
+                if (mensajes['alerta'] != '') {
+                    generarMensajeAlerta(mensajes);
+                }
+                if (mensajes['error'] != '') {
+                    generarMensajeError(mensajes);
+                }
+            })
+            .catch(function (error) {
+                error
+            })
+    });
+
+    function print_roof_delivery(miArray) {
+        var arrayComoCadena = JSON.stringify(miArray);
+
+        // Construir la URL con el parámetro
+        var url = "{{ url_for('report.print_proof_delivery' ) }}?medicamentos=" + encodeURIComponent(arrayComoCadena);
+
+        // Enviar la URL a algún lugar (por ejemplo, redirigir a la nueva página)
+        window.open(url, '_blank');
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,396 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form id="frmRegConsulta">
+                    <h4 class="card-title">{{ title }}</h4>
+                    <div class="row">
+                        {{ formFP.hidden_tag() }}
+                        <div class="col-md-12">
+                            <div class="input-group mb-3">
+                                <button class="btn btn-outline-secondary" type="button" id="btnIdentificacionCamara">
+                                    <i class="fa-regular fa-face-smile-beam"></i>
+                                </button>
+                                <div class="form-floating">
+                                    <input type="text" aria-label="Buscar" aria-describedby="btnBuscarPersona"
+                                        class="form-control" readonly name="txtPersona" id="txtPersona"
+                                        placeholder="" />
+                                    <label for="txtPersona">Persona</label>
+                                    {{ formFP.txtPersonaCod(class="form-control") }}
+                                </div>
+                                <button class="btn btn-outline-secondary" type="button" id="btnBuscarPersona"
+                                    data-bs-toggle="modal" data-bs-target="#mdlBuscarPersona">
+                                    <i class="fa fa-search" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="card mb-3" id="person-data" hidden>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6 order-md-last">
+                                    <p>Nombres y Apellidos: <b id="person-name"></b></p>
+                                    <p>Cédula: <b id="person-dni"></b></p>
+                                    <p>Sexo: <b id="person-gender"></b></p>
+                                    <p>Edad: <b id="person-age"></b></p>
+                                    <p>Fecha de Nacimiento: <b id="person-birthdate"></b></p>
+                                </div>
+                                <div class="col-md-6 order-md-first" id="person-last-photo">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="divbtnHistorial" hidden>
+                        <div class="col-md-12 mb-3">
+                            <div class="d-grid gap-2">
+                                <button type="button" name="btnHistorialConsulta" id="btnHistorialConsulta"
+                                    class="btn btn-light" data-bs-toggle="modal" data-bs-target="#mdlHistorialConsulta">
+                                    Ver Historial de Consultas
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <div class="form-floating">
+                                {{ formFP.txtDiagnostico(class="form-control", placeholder="", style="height: 200px") }}
+                                <label for="txtDiagnostico">Diagnóstico</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <button type="button" class="btn btn-info w-100" onclick="addField()">Recetar Nuevo
+                                Medicamento</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {% for dynamic_field in formFP.dynamic_fields %}
+                            <div class="form-floating">
+                                {{ dynamic_field.txtMedicina(placeholder="", class="form-control") }}
+                                <label>Medicamento 1</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            {% for dynamic_field in formFP.dynamic_fields %}
+                            <div class="form-floating">
+                                {{ dynamic_field.txtIndicacionesMedicas(placeholder="", class="form-control",
+                                style="height: 100px") }}
+                                <label>Instrucciones Médicas del Medicamento 1</label>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div id="dynamic-fields-container">
+
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="btnRegDatos" id="btnRegDatos" class="btn btn-primary">
+                                    Registrar Datos
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="mdlBuscarPersona" aria-hidden="true" aria-labelledby="mdlBuscarPersonaLabel" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlBuscarPersonaLabel">
+                    Buscar Persona
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="frmBusqPers">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtCedulaBusqPersona(class="form-control
+                                form-control-sm") }}
+                                <label for="txtCedulaBusqPersona">Cédula</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtNombBusqPersona(class="form-control
+                                form-control-sm") }}
+                                <label for="txtNombBusqPersona">Nombres</label>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-floating mb-3">
+                                {{ formBusq.txtApellidosBusqPersona(class="form-control
+                                form-control-sm") }}
+                                <label for="txtApellidosBusqPersona">Apellidos</label>
+                            </div>
+                        </div>
+                        {{ formBusq.hidden_tag() }}
+                        <div class="col-md-12 mb-3">
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="btnBusqPersona" id="btnBusqPersona" class="btn btn-primary">
+                                    Buscar Persona
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-secondary">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Cédula</th>
+                                    <th scope="col">Persona</th>
+                                    <th scope="col">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="listPersonas">
+                                <tr class="">
+                                    <td colspan="3" class="text-center">
+                                        <h5>Ingrese los datos para realizar la busqueda</h5>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">
+                    Volver al Formulario Anterior
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="mdlHistorialConsulta" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+    role="dialog" aria-labelledby="modalTitleId" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitleId">
+                    Últimas 10 consultas
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"></th>
+                                        <th scope="col">Fecha</th>
+                                        <th scope="col">Médico</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listConsultas">
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    var csrfToken = document.querySelector("[name='csrf_token']").value;
+    axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+
+    var frmBusqPers = document.querySelector("#frmBusqPers");
+    frmBusqPers.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmBusqPers);
+        axios.post("{{ url_for('people.search_people' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['error'] != "") {
+                    generarMensajeError(mensajes);
+                }
+                document.getElementById('listPersonas').innerHTML = "<tr><td colspan='3' class='text-center text-danger'><h4 style=''>No se han encontrado personas con los datos ingresados</h4></td></tr>";
+                if (mensajes['correcto'] != "") {
+                    var h = "";
+                    var c = mensajes['correcto'];
+                    for (var i = 0, len = c.length; i < len; i++) {
+                        h += '<tr>';
+                        h += '<td>' + c[i].dni + '</td>';
+                        h += '<td>' + c[i].names + ' ' + c[i].lastname + '</td>';
+                        h += '<td><div class="d-grid gap-2"><button data-bs-dismiss="modal" type="button" value="' + c[i].id + '@' + c[i].dni + '@' + c[i].names + ' ' + c[i].lastname + '@' + c[i].gender + '@' + c[i].age + '@' + c[i].birthdate + '" name="btnSelecPers" id="btnSelecPers" class="btnSelectPers btn btn-primary">Seleccionar</button></div></td>';
+                        h += '</tr>';
+                    };
+                    document.getElementById('listPersonas').innerHTML = h;
+                    var btnSelectPers = document.querySelectorAll(".btnSelectPers");
+                    btnSelectPers.forEach(function (button) {
+                        button.addEventListener('click', (e) => {
+                            var value = button.value.split('@');
+                            var id = value[0];
+                            var dni = value[1];
+                            var person = value[2];
+                            var gender = value[3];
+                            var age = value[4];
+                            var birthdate = value[5];
+                            document.getElementById("txtPersona").value = person;
+                            document.getElementById("txtPersonaCod").value = id;
+                            document.getElementById("person-name").innerHTML = person;
+                            document.getElementById("person-dni").innerHTML = dni;
+                            document.getElementById("person-gender").innerHTML = gender;
+                            document.getElementById("person-age").innerHTML = age;
+                            document.getElementById("person-birthdate").innerHTML = birthdate;
+                            getPersonPhoto(id);
+                            document.getElementById("person-data").removeAttribute("hidden");
+                            document.getElementById("divbtnHistorial").removeAttribute("hidden");
+                        });
+                    });
+                }
+            })
+            .catch(function (error) {
+                error
+            })
+    });
+    var btnIdentificacionCamara = document.querySelector("#btnIdentificacionCamara");
+    btnIdentificacionCamara.addEventListener('click', (e) => {
+        e.preventDefault();
+        axios.post("{{ url_for('ia.identify' ) }}", { TRAIN: "IDENTIFY" }, axiosConfig())
+            .then(function (response) {
+                var r = response.data;
+                if (r['correcto'] != "") {
+                    generarMensajeCorrecto(r);
+                    document.getElementById("txtPersona").value = r['name'];
+                    document.getElementById("txtPersonaCod").value = r['cod'];
+                    document.getElementById("person-name").innerHTML = r['name'];
+                    document.getElementById("person-dni").innerHTML = r['dni'];
+                    document.getElementById("person-gender").innerHTML = r['gender'];
+                    document.getElementById("person-age").innerHTML = r['age'];
+                    document.getElementById("person-birthdate").innerHTML = r['birthdate'];
+                    getPersonPhoto(r['cod']);
+                    document.getElementById("person-data").removeAttribute("hidden");
+                    document.getElementById("divbtnHistorial").removeAttribute("hidden");
+                } else {
+                    generarMensajeAlerta(r);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+    function getPersonPhoto(person) {
+        console.log(person);
+        axios.get("{{ url_for('people.get_person_last_photo' , person='') }}/" + person)
+            .then(function (response) {
+                var r = response.data;
+                if (r['photo'] != "") {
+                    var photo = r['photo'];
+                    if (photo) {
+                        document.getElementById("person-last-photo").innerHTML = '<img src="{{ url_for("static", filename="uploads/people_photo/") }}/' + photo + '" class="img-fluid img-thumbnail rounded" alt="Last Photo" style="height: 200px" />';
+                    } else {
+                        document.getElementById("person-last-photo").innerHTML = '<img src="{{ url_for("static", filename="img/27002.jpg") }}" class="img-fluid img-thumbnail rounded" alt="Last Photo" style="height: 200px" />';
+                    }
+                }
+                if (r['consultation'] != "") {
+                    var c = r['consultation'];
+                    var z = "";
+                    for (var i = 0, len = c.length; i < len; i++) {
+                        z += '<tr>';
+                        z += '<td><a name="" id="" class="btn btn-primary" href="{{ url_for("doctors.consultation_details", consultation="" ) }}/' + c[i].id + '" role="button" >Ver Detalles</a></td>';
+                        z += '<td>' + c[i].date + '</td>';
+                        z += '<td>' + c[i].doctor + '</td>';
+                        z += '</tr>';
+                    };
+                    document.getElementById("listConsultas").innerHTML = z;
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+    var cant = 0;
+
+    function addField() {
+        cant++;
+
+        // Realizar una solicitud AJAX al servidor para obtener el nuevo fragmento HTML
+        fetch(`/get_dynamic_fields/${cant}`)
+            .then(response => response.text())
+            .then(htmlFragment => {
+                // Crear un nuevo div con la clase "row" y agregar el fragmento HTML
+                var container = document.getElementById('dynamic-fields-container');
+                var newField = document.createElement('div');
+                newField.classList.add('row');
+                newField.innerHTML = htmlFragment;
+
+                // Agregar el nuevo campo al contenedor
+                container.appendChild(newField);
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+
+    var frmRegConsulta = document.querySelector('#frmRegConsulta');
+    frmRegConsulta.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmRegConsulta);
+        axios.post("{{ url_for('doctors.registers_data_consultation' ) }}", formData)
+            .then(function (response) {
+                var r = response.data;
+                if (r['correcto'] != "") {
+                    $.confirm({
+                        title: 'Correcto',
+                        content: r['correcto'],
+                        type: 'green',
+                        buttons: {
+                            aceptar: {
+                                text: 'Aceptar',
+                                btnClass: 'btn btn-success',
+                                action: function () {
+                                    print_proof_consulting(r['consulting'])
+                                }
+                            }
+                        }
+                    });
+                }
+                if (r['alerta'] != "") {
+                    generarMensajeAlerta(r);
+                }
+                if (r['error'] != "") {
+                    generarMensajeError(r);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+
+    function print_proof_consulting(consulting) {
+        var url = "{{ url_for('report.print_proof_consulting' ) }}?consulta=" + encodeURIComponent(consulting);
+
+        window.open(url, '_blank');
+    }
+</script>
+{% endblock %}

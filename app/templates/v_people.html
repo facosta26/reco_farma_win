@@ -1,0 +1,248 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ title }}</h4>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-grid gap-2">
+                            <button type="button" name="btnDatosPersona" id="btnDatosPersona" class="btn btn-primary"
+                                data-bs-toggle="modal" data-bs-target="#mdlDatosPersona">
+                                Nueva Persona
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <form id="frmDatosPersona">
+                    <div class="modal fade" id="mdlDatosPersona" tabindex="-1" data-bs-backdrop="static"
+                        data-bs-keyboard="false" role="dialog" aria-labelledby="mdlDatosPersona" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-xl"
+                            role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="mdlDatosPersona">
+                                        Datos de Persona
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.txtDniPersona(class="form-control form-control-sm",
+                                                placeholder="Cédula") }}
+                                                <label for="txtDniPersona">Cédula</label>
+                                                <p class="validateDni form-text text-danger" id="validateDni" hidden>Ya
+                                                    existe una persona con el número de cédula ingresado</p>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.txtNombrePersona(class="form-control form-control-sm",
+                                                placeholder="Nombres") }}
+                                                <label for="txtNombrePersona">Nombres</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.txtApellidoPersona(class="form-control form-control-sm",
+                                                placeholder="Apellidos") }}
+                                                <label for="txtApellidoPersona">Apellidos</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.sltSexoPersona(class="form-control form-control-sm") }}
+                                                <label for="sltSexoPersona">Sexo</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="form-floating mb-3">
+                                                {{ form.txtFechaNacimiento(class="form-control form-control-sm",
+                                                placeholder="Fecha de Nacimiento") }}
+                                                <label for="txtFechaNacimiento">Fecha de Nacimiento</label>
+                                            </div>
+                                        </div>
+                                        <!-- <div class="col-md-4">
+                                            <div class="form-floating mb-3">
+                                                <input type="file" class="form-control" name="fileFotoPersona"
+                                                    id="fileFotoPersona" accept="image/*" capture="camera">
+                                                <label for="txtFechaNacimiento">Foto Persona</label>
+                                            </div>
+                                        </div> -->
+                                    </div>
+                                    <!-- <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="d-grid gap-2">
+                                                <button type="button" name="btnVolverCapturar" id="btnVolverCapturar"
+                                                    class="btn btn-primary">
+                                                    Volver a Capturar Foto
+                                                </button>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-md-4 offset-md-4">
+                                            <div class="d-grid gap-2">
+                                                <button
+                                                    type="button"
+                                                    name="captureBtn"
+                                                    id="captureBtn"
+                                                    class="btn btn-primary"
+                                                >
+                                                    Capturar Foto
+                                                </button>
+                                            </div>
+                                            
+                                        </div>
+                                        <video id="video" width="640" height="480" autoplay></video>
+                                        <br>
+                                        <br>
+                                        <input type="image" class="img-fluid" id="capturedImage" style="display:none;"
+                                            width="320" height="240">
+                                    </div> -->
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        Cerrar
+                                    </button>
+                                    {{ form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-primary">Guardar Datos</button>
+                                    <div class="btnTakePhoto"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-primary">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Acción</th>
+                                        <th scope="col">DNI</th>
+                                        <th scope="col">Persona</th>
+                                        <th scope="col">Edad</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listPersonas">
+                                    <tr>
+                                        <td colspan="4" class="text-center">
+                                            <h4>SIN REGISTROS</h4>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    var csrfToken = document.querySelector("[name='csrf_token']").value;
+    axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+    var txtDniPersona = document.querySelector("#txtDniPersona");
+    txtDniPersona.addEventListener('keyup', (e) => {
+        e.preventDefault();
+        var dni = txtDniPersona.value;
+        axios.post("{{ url_for('people.comprobate_dni' ) }}", { txtDniPersona: dni }, axiosConfig())
+            .then(function (response) {
+                var r = response.data;
+                if (r['error'] != "") {
+                    document.querySelector(".validateDni").hidden = false;
+                } else {
+                    document.querySelector(".validateDni").hidden = true;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+    var frmDatosPersona = document.querySelector("#frmDatosPersona");
+    frmDatosPersona.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmDatosPersona);
+        axios.post("{{ url_for('people.register_data' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['correcto'] != '') {
+                    generarMensajeCorrecto(mensajes, getPeople);
+                    var btnTakePhoto = document.querySelector(".btnTakePhoto");
+                    var id = mensajes['id'];
+                    var html = '<a href="{{ url_for("people.take_photo",  dni="" ) }}/ '+ id +'"><button type="button" class="btn btn-info">Tomar Foto</button></a>';
+                    btnTakePhoto.innerHTML = html;
+                    
+                }
+                if (mensajes['error'] != '') {
+                    generarMensajeError(mensajes);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+    function getPeople() {
+        axios.get("{{ url_for('people.get_people_data' ) }}")
+            .then(function (response) {
+                var people = response.data.data;
+                var h = '';
+                document.getElementById("listPersonas").innerHTML = h;
+                for (const person of people) {
+                    h += `
+                <tr>
+                    <td>
+                        <div class="d-grid gap-2">
+                            <button
+                            type="button"
+                            name="btnEditar"
+                            class="btnEditar btn btn-secondary"
+                            value="${person.dni}/${person.names}/${person.lastnames}/${person.gender}/${person.birthdate}"
+                            data-bs-target="#mdlDatosPersona"
+                            data-bs-toggle="modal"
+                            >
+                            Editar
+                            </button>
+                        </div>
+                    </td>
+                    <td>${person.dni}</td>
+                    <td>${person.person}</td>
+                    <td>${person.age}</td>
+                </tr>
+                `;
+                }
+                document.getElementById("listPersonas").innerHTML = h;
+                document.getElementById("listPersonas").addEventListener('click', (e) => {
+                    if (e.target.classList.contains("btnEditar")) {
+                        const value = e.target.value.split('/');
+                        document.getElementById("txtDniPersona").value = value[0];
+                        document.getElementById("txtNombrePersona").value = value[1];
+                        document.getElementById("txtApellidoPersona").value = value[2];
+                        document.getElementById("sltSexoPersona").value = value[3];
+                        document.getElementById("txtFechaNacimiento").value = value[4];
+                        var btnTakePhoto = document.querySelector(".btnTakePhoto");
+                        var id = value[0];
+                        var html = '<a href="{{ url_for("people.take_photo", dni="") }}/'+id+'"><button type="button" class="btn btn-info">Tomar Foto</button></a>';
+                        btnTakePhoto.innerHTML = html;
+                    }
+                });
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+    getPeople();
+</script>
+{% endblock %}

@@ -1,0 +1,507 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{title}}</h4>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card border-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Listado de Especialidades Médicas
+                                    <button id="btnNuevoEM" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#mdlNuevoEM">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
+                                    </button>
+                                    <form id="frmRegME">
+                                        <div class="modal fade" id="mdlNuevoEM" tabindex="-1" data-bs-backdrop="static"
+                                            data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleId"
+                                            aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalTitleId">
+                                                            Especialidades Médicas
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ fme.hidden_tag() }}
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fme.txtDescripcionME(class="form-control",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fme.txtDescripcionME.label }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fme.sltEstadoME(class="form-select") }}
+                                                                    <label for="sltEstadoME">Estado</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">
+                                                            Cerrar
+                                                        </button>
+                                                        {{ fme.txtMEcod() }}
+                                                        <button type="submit" class="btn btn-primary">Guardar
+                                                            Datos</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Descripción</th>
+                                                        <th>Estado</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="listEspecialidadesMedicas">
+                                                    <tr>
+                                                        <td colspan="3" class="text-center">
+                                                            <h4>No hay datos registrados</h4>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card border-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Listado de Instituciones Médicas
+                                    <button id="btnNuevoIM" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#mdlNuevoIM">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
+                                    </button>
+                                    <form id="frmRegIM">
+                                        <div class="modal fade" id="mdlNuevoIM" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false"
+                                            role="dialog" aria-labelledby="titleNuevoIM" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="titleNuevoIM">
+                                                            Instituciones Médicas
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ fmi.hidden_tag() }}
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fmi.txtItinIM(class="form-control",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fmi.txtItinIM.label }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fmi.txtNombreFantasiaIM(class="form-control",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fmi.txtNombreFantasiaIM.label }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fmi.txtRazonSocialIM(class="form-control",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fmi.txtRazonSocialIM.label }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fmi.sltEstadoIM(class="form-select",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fmi.sltEstadoIM.label }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            Cerrar
+                                                        </button>
+                                                        {{ fmi.txtIMcod() }}
+                                                        <button type="submit" class="btn btn-primary">Guardar
+                                                            Datos</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>R.U.C.</th>
+                                                        <th>Nombre Fantasia</th>
+                                                        <th>Razón Social</th>
+                                                        <th>Estado</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="listInstitucionesMedicas">
+                                                    <tr>
+                                                        <td colspan="5" class="text-center">
+                                                            <h4>No hay datos registrados</h4>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="card border-primary mb-3">
+                            <div class="card-body">
+                                <h5 class="card-title">Listado de Tipos de Empaques
+                                    <button id="btnNuevoTE" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#mdlNuevoTE">
+                                        <i class="fa fa-plus" aria-hidden="true"></i> Nuevo
+                                    </button>
+                                    <form id="frmRegTE">
+                                        <div class="modal fade" id="mdlNuevoTE" tabindex="-1" data-bs-backdrop="static"
+                                            data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleIdTE" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="modalTitleIdTE">
+                                                            Tipos de Empaques
+                                                        </h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        {{ fte.hidden_tag() }}
+                                                        <div class="row">
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fte.txtDescripcionTE(class="form-control",
+                                                                    placeholder="Descripcion") }}
+                                                                    {{ fte.txtDescripcionTE.label }}
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12">
+                                                                <div class="form-floating mb-3">
+                                                                    {{ fte.sltEstadoTE(class="form-select") }}
+                                                                    <label for="sltEstadoTE">Estado</label>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                            Cerrar
+                                                        </button>
+                                                        {{ fte.txtTEcod() }}
+                                                        <button type="submit" class="btn btn-primary">Guardar
+                                                            Datos</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped align-middle">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th>Descripción</th>
+                                                        <th>Estado</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="listTiposEmpaques">
+                                                    <tr>
+                                                        <td colspan="3" class="text-center">
+                                                            <h4>No hay datos registrados</h4>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                                <tfoot>
+                    
+                                                </tfoot>
+                                            </table>
+                                        </div>
+                    
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    function getMedicalEspecialties() {
+        axios.get("{{ url_for('maint.get_medical_especialties' ) }}")
+            .then(function (response) {
+                var r = response.data;
+                if (r != "") {
+                    var h = "";
+                    for (var i = 0, len = r.length; i < len; i++) {
+                        h += `
+                        <tr>
+                            <td>${r[i].desc}</td>
+                            <td>${r[i].state_desc}</td>
+                            <td><div class="d-grid gap-2">
+                                <button
+                                    type="button"
+                                    name="btnEditarME"
+                                    id="btnEditarME"
+                                    class="btnEditarME btn btn-primary"
+                                    value="${r[i].id}/${r[i].desc}/${r[i].state}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#mdlNuevoEM"
+                                >
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                            </td>
+                        </tr>
+                        `;
+                    };
+                    document.getElementById("listEspecialidadesMedicas").innerHTML = h;
+                    var btnEditarME = document.getElementsByClassName("btnEditarME");
+
+                    for (var i = 0; i < btnEditarME.length; i++) {
+                        btnEditarME[i].addEventListener("click", function (e) {
+                            var id = e.target.value.split("/")[0];
+                            var desc = e.target.value.split("/")[1];
+                            var state = e.target.value.split("/")[2];
+                            document.getElementById("txtMEcod").value = id;
+                            document.getElementById("txtDescripcionME").value = desc;
+                            document.getElementById("sltEstadoME").value = state;
+                        });
+                    }
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+    function getMedicalInstitutes() {
+        axios.get("{{ url_for('maint.get_medical_institutes' ) }}")
+            .then(function (response) {
+                var r = response.data;
+                if (r != "") {
+                    var h = "";
+                    for (var i = 0, len = r.length; i < len; i++) {
+                        h += `
+                        <tr>
+                            <td>${r[i].itin}</td>
+                            <td>${r[i].trade_name}</td>
+                            <td>${r[i].bussiness_name}</td>
+                            <td>${r[i].state_desc}</td>
+                            <td><div class="d-grid gap-2">
+                                <button
+                                    type="button"
+                                    name="btnEditarIM"
+                                    id="btnEditarIM"
+                                    class="btnEditarIM btn btn-primary"
+                                    data-bs-toggle="modal" data-bs-target="#mdlNuevoIM"
+                                    value="${r[i].id}/${r[i].itin}/${r[i].trade_name}/${r[i].bussiness_name}/${r[i].state}"
+                                >
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                            </td>
+                        </tr>
+                        `;
+                    };
+                    document.getElementById("listInstitucionesMedicas").innerHTML = h;
+                    var btnEditarIM = document.getElementsByClassName("btnEditarIM");
+
+                    for (var i = 0; i < btnEditarIM.length; i++) {
+                        btnEditarIM[i].addEventListener("click", function (e) {
+                            var id = e.target.value.split("/")[0];
+                            var itin = e.target.value.split("/")[1];
+                            var trade_name = e.target.value.split("/")[2];
+                            var bussiness_name = e.target.value.split("/")[3];
+                            var state = e.target.value.split("/")[4];
+                            document.getElementById("txtIMcod").value = id;
+                            document.getElementById("txtItinIM").value = itin;
+                            document.getElementById("txtNombreFantasiaIM").value = trade_name;
+                            document.getElementById("txtRazonSocialIM").value = bussiness_name;
+                            document.getElementById("sltEstadoIM").value = state;
+                        });
+                    }
+
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    }
+    function getParcelTypes() {
+            axios.get("{{ url_for('maint.get_parcel_types' ) }}")
+                .then(function (response) {
+                    var r = response.data;
+                    if (r != "") {
+                        var h = "";
+                        for (var i = 0, len = r.length; i < len; i++) {
+                            h += `
+                        <tr>
+                            <td>${r[i].desc}</td>
+                            <td>${r[i].state_desc}</td>
+                            <td><div class="d-grid gap-2">
+                                <button
+                                    type="button"
+                                    name="btnEditarTE"
+                                    id="btnEditarTE"
+                                    class="btnEditarTE btn btn-primary"
+                                    value="${r[i].id}/${r[i].desc}/${r[i].state}"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#mdlNuevoTE"
+                                >
+                                    <i class="fas fa-edit"></i> Editar
+                                </button>
+                            </div>
+                            </td>
+                        </tr>
+                        `;
+                        };
+                        document.getElementById("listTiposEmpaques").innerHTML = h;
+                        var btnEditarTE = document.getElementsByClassName("btnEditarTE");
+
+                        for (var i = 0; i < btnEditarTE.length; i++) {
+                            btnEditarTE[i].addEventListener("click", function (e) {
+                                var id = e.target.value.split("/")[0];
+                                var desc = e.target.value.split("/")[1];
+                                var state = e.target.value.split("/")[2];
+                                document.getElementById("txtTEcod").value = id;
+                                document.getElementById("txtDescripcionTE").value = desc;
+                                document.getElementById("sltEstadoTE").value = state;
+                            });
+                        }
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+        }
+    getMedicalEspecialties();
+    getMedicalInstitutes();
+    getParcelTypes();
+    var frmRegME = document.querySelector('#frmRegME');
+    frmRegME.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(frmRegME);
+        axios.post("{{ url_for('maint.add_medical_especialties' ) }}", formData)
+            .then(function (response) {
+                var r = response.data;
+                if (r['correcto'] != "") {
+                    generarMensajeCorrecto(r, getMedicalEspecialties);
+                }
+                if (r['alerta'] != "") {
+                    generarMensajeAlerta(r, getMedicalEspecialties);
+                }
+                if (r['error'] != "") {
+                    generarMensajeError(r);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+    var frmRegIM = document.querySelector('#frmRegIM');
+    frmRegIM.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var formData = new FormData(frmRegIM);
+        axios.post("{{ url_for('maint.add_medical_institutes' ) }}", formData)
+           .then(function (response) {
+                var r = response.data;
+                if (r['correcto']!= "") {
+                    generarMensajeCorrecto(r, getMedicalInstitutes);
+                }
+                if (r['alerta']!= "") {
+                    generarMensajeAlerta(r, getMedicalInstitutes);
+                }
+                if (r['error']!= "") {
+                    generarMensajeError(r);
+                }
+            })
+           .catch(function (error) {
+                console.log(error);
+            })
+    });
+    var frmRegTE = document.querySelector('#frmRegTE');
+        frmRegTE.addEventListener('submit', function (e) {
+            e.preventDefault();
+            var formData = new FormData(frmRegTE);
+            axios.post("{{ url_for('maint.add_parcel_types' ) }}", formData)
+                .then(function (response) {
+                    var r = response.data;
+                    if (r['correcto'] != "") {
+                        generarMensajeCorrecto(r, getParcelTypes);
+
+                    }
+                    if (r['alerta'] != "") {
+                        generarMensajeAlerta(r, getParcelTypes);
+                    }
+                    if (r['error'] != "") {
+                        generarMensajeError(r);
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                })
+        });
+        var btnNuevoEM = document.getElementById('btnNuevoEM');
+        btnNuevoEM.addEventListener('click', function (e) {
+            document.getElementById("frmRegME").reset();
+        });
+
+        var btnNuevoIM = document.getElementById('btnNuevoIM');
+        btnNuevoIM.addEventListener('click', function (e) {
+            document.getElementById("frmRegIM").reset();
+        });
+
+        var btnNuevoTE = document.getElementById('btnNuevoTE');
+        btnNuevoTE.addEventListener('click', function (e) {
+            document.getElementById("frmRegTE").reset();
+        });
+
+</script>
+{% endblock %}

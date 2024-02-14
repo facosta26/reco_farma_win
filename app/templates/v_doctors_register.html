@@ -1,0 +1,300 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{title}}</h4>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <div class="d-grid gap-2">
+                            <button type="button" data-bs-toggle="modal" data-bs-target="#mdlMedicos"
+                                name="btnNuevoMedico" id="btnNuevoMedico" class="btn btn-primary">
+                                Nuevo Médico
+                            </button>
+                        </div>
+                        <form id="frmMedicos">
+                            <div class="modal fade" id="mdlMedicos" tabindex="-1" data-bs-backdrop="static"
+                                data-bs-keyboard="false" role="dialog" aria-labelledby="modalTitleMdlMedico"
+                                aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg"
+                                    role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="modalTitleMdlMedico">
+                                                Datos del Médico
+                                            </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-12">                                                    
+                                                    <div class="input-group mb-3">
+                                                        <div class="form-floating">
+                                                            <input type="text" aria-label="Buscar" aria-describedby="btnBuscarPersona" class="form-control" readonly
+                                                                name="txtPersona" id="txtPersona" placeholder="" />
+                                                            <label for="txtPersona">Persona</label>
+                                                            {{ formDoct.txtPersonaCod(class="form-control") }}
+                                                        </div>
+                                                        <button class="btn btn-outline-secondary" type="button" id="btnBuscarPersona" data-bs-toggle="modal"
+                                                            data-bs-target="#mdlBuscarPersona">
+                                                            Buscar
+                                                        </button>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-floating mb-3">
+                                                            {{ formDoct.txtDoctorMatricula(class="form-control form-control-sm", placeholder="") }}
+                                                            {{ formDoct.txtDoctorMatricula.label()}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-floating mb-3">
+                                                            {{ formDoct.sltEspecialidadMedica(class="form-select form-select-sm", placeholder="") }}
+                                                            {{ formDoct.sltEspecialidadMedica.label()}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-floating mb-3">
+                                                            {{ formDoct.sltInstitucionMedica(class="form-select form-select-sm", placeholder="") }}
+                                                            {{ formDoct.sltInstitucionMedica.label()}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <div class="form-floating mb-3">
+                                                            {{ formDoct.sltEstado(class="form-select form-select-sm", placeholder="") }}
+                                                            {{ formDoct.sltEstado.label()}}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                                Cerrar
+                                            </button>
+                                            {{ formDoct.hidden_tag() }}
+                                            <button type="submit" class="btn btn-primary">Guardar datos</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="modal fade" id="mdlBuscarPersona" aria-hidden="true" aria-labelledby="mdlBuscarPersonaLabel" tabindex="-1">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="mdlBuscarPersonaLabel">
+                                            Buscar Persona
+                                        </h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="frmBusqPers">
+                                            <div class="row">
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        {{ formBusq.txtCedulaBusqPersona(class="form-control form-control-sm") }}
+                                                        <label for="txtCedulaBusqPersona">Cédula</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        {{ formBusq.txtNombBusqPersona(class="form-control form-control-sm") }}
+                                                        <label for="txtNombBusqPersona">Nombres</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12">
+                                                    <div class="form-floating mb-3">
+                                                        {{ formBusq.txtApellidosBusqPersona(class="form-control form-control-sm") }}
+                                                        <label for="txtApellidosBusqPersona">Apellidos</label>
+                                                    </div>
+                                                </div>
+                                                {{ formBusq.hidden_tag() }}
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="d-grid gap-2">
+                                                        <button type="submit" name="btnBusqPersona" id="btnBusqPersona" class="btn btn-primary">
+                                                            Buscar Persona
+                                                        </button>
+                                                    </div>
+                        
+                                                </div>
+                                            </div>
+                                        </form>
+                                        <div class="row">
+                                            <div class="table-responsive">
+                                                <table class="table table-secondary">
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">Cédula</th>
+                                                            <th scope="col">Persona</th>
+                                                            <th scope="col">Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="listPersonas">
+                                                        <tr class="">
+                                                            <td colspan="3" class="text-center">
+                                                                <h5>Ingrese los datos para realizar la busqueda</h5>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                        
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button class="btn btn-primary" data-bs-target="#mdlMedicos" data-bs-toggle="modal">
+                                            Volver al Formulario Anterior
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive">
+                            <table class="table table-primary">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Acción</th>
+                                        <th scope="col">Nro. de Mátricula</th>
+                                        <th scope="col">Nombre y Apellido</th>
+                                        <th scope="col">Institución</th>
+                                        <th scope="col">Especialidad</th>
+                                        <th scope="col">Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="listMedicos">
+
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+    var frmBusqPers = document.querySelector("#frmBusqPers");
+    frmBusqPers.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmBusqPers);
+        axios.post("{{ url_for('people.search_people' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['error'] != "") {
+                    generarMensajeError(mensajes);
+                }
+                document.getElementById('listPersonas').innerHTML = "<tr><td colspan='3' class='text-center text-danger'><h4 style=''>No se han encontrado personas con los datos ingresados</h4></td></tr>";
+                if (mensajes['correcto'] != "") {
+                    var h = "";
+                    var c = mensajes['correcto'];
+                    for (var i = 0, len = c.length; i < len; i++) {
+                        h += '<tr>';
+                        h += '<td>' + c[i].dni + '</td>';
+                        h += '<td>' + c[i].names + ' ' + c[i].lastname + '</td>';
+                        h += '<td><div class="d-grid gap-2"><button data-bs-target="#mdlMedicos" data-bs-toggle="modal" type="button" value="' + c[i].id + '/' + c[i].dni + '/' + c[i].names + ' ' + c[i].lastname + '" name="btnSelecPers" id="btnSelecPers" class="btnSelectPers btn btn-primary">Seleccionar</button></div></td>';
+                        h += '</tr>';
+                    };
+                    document.getElementById('listPersonas').innerHTML = h;
+                    var btnSelectPers = document.querySelectorAll(".btnSelectPers");
+                    btnSelectPers.forEach(function (button) {
+                        button.addEventListener('click', (e) => {
+                            var value = button.value.split('/');
+                            var id = value[0];
+                            var dni = value[1];
+                            var person = value[2];
+                            document.getElementById("txtPersona").value = person;
+                            document.getElementById("txtPersonaCod").value = id;
+                        });
+                    });
+                }
+            })
+            .catch(function (error) {
+                error
+            })
+    });
+
+    var frmMedicos = document.querySelector("#frmMedicos");
+        frmMedicos.addEventListener('submit', (e) => {
+            e.preventDefault();
+            var formData = new FormData(frmMedicos);
+            axios.post("{{ url_for('doctors.doctors_data_register' ) }}", formData)
+                .then(function (response) {
+                    var mensajes = response.data;
+                    if (mensajes['correcto'] != '') {
+                        generarMensajeCorrecto(mensajes, getDoctors);
+                    }
+                    if (mensajes['error'] != '') {
+                        generarMensajeError(mensajes);
+                    }
+                })
+                .catch(function (error) {
+                    error
+                })
+        });
+
+    const url_get_users = "{{ url_for('doctors.get_doctors_list' ) }}";
+
+        const getDoctors = async () => {
+            const response = await axios.get(url_get_users);
+
+            if (response.status === 200) {
+                const doctors = response.data.data;
+
+                document.querySelector('#listMedicos').innerHTML = ""; 
+                var h = "";
+                for (const doctor of doctors) {
+                    h += `
+                <tr>
+                <td>
+                <div class="d-grid gap-2">
+                    <button
+                    type="button"
+                    name="btnEditar"
+                    class="btnEditar btn btn-secondary"
+                    value="${doctor.id}/${doctor.person}/${doctor.person_id}/${doctor.state}/${doctor.institute_id}/${doctor.especialty_id}/${doctor.prof_reg}"
+                    data-bs-target="#mdlMedicos"
+                    data-bs-toggle="modal"
+                    >
+                    Editar
+                    </button>
+                </div>
+                </td>
+                <td>${doctor.prof_reg}</td>
+                <td>${doctor.person}</td>
+                <td>${doctor.institute}</td>
+                <td>${doctor.especialty}</td>
+                <td>${doctor.state_full}</td>
+                </tr>
+                `;
+                    document.querySelector('#listMedicos').innerHTML = h;
+
+                }
+                var btnEditar = document.querySelectorAll(".btnEditar");
+                btnEditar.forEach(function (button) {
+                    button.addEventListener('click', (e) => {
+                        var value = button.value.split('/');
+                        document.getElementById("txtPersona").value = value[1];
+                        document.getElementById("txtPersonaCod").value = value[2];
+                        document.getElementById("sltEstado").value = value[3];
+                        document.getElementById("sltInstitucionMedica").value = value[4];
+                        document.getElementById("sltEspecialidadMedica").value = value[5];
+                        document.getElementById("txtDoctorMatricula").value = value[6];
+                    });
+                });
+            }
+        };
+
+
+        getDoctors();
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Constancia de Entrega</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Constancia de Entrega de Medicamentos</h2>
+    <p>El/la farmaceutico(a) {{ session['person'] }}, deja constancia de haber entregado satifactoriamente los
+        medicamentos más abajo declarados al paciente <b>{{ datos_persona.peop_names+' '+datos_persona.peop_lastnames
+            }}</b> en fecha {{ datos[0].prde_date_dispatched.strftime('%d/%m/%Y') }}</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Medicamento</th>
+                <th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in datos %}
+            <tr>
+                <td>{{ m.prde_medicine.upper() }}</td>
+                <td>{{ m.prde_quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <th>Total Entregados:</th>
+                <th>{{ datos[0].total_quantity }}</th>
+            </tr>
+        </tfoot>
+    </table>
+
+    <p>A continuación el paciente deja constancia de su conformidad con la entrega, presentando firma ológrafa del
+        mismo.</p>
+    <p>{{ datos_persona.peop_names+' '+datos_persona.peop_lastnames }}<br>{{ datos_persona.peop_dni }}</p>
+</body>
+
+</html>

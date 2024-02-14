@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Video Streaming</title>
+</head>
+
+<body>
+    <video id="video" autoplay></video>
+    <canvas id="canvas" style="display:none;"></canvas> <!-- Create a hidden canvas -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.0/socket.io.min.js"></script>
+    <script>
+        const socket = io();
+
+        // Connect to the server
+        socket.connect('http://localhost:5000');
+
+        // Get access to the user's camera
+        const constraints = {
+            video: true
+        };
+        navigator.mediaDevices.getUserMedia(constraints)
+            .then(stream => {
+                // Create a video element to display the camera feed
+                const video = document.getElementById('video');
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    // Start streaming the camera feed
+                    video.play();
+                    // Create a hidden canvas
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
+                    // Send camera data to the server
+                    function sendData() {
+                        canvas.width = video.videoWidth;
+                        canvas.height = video.videoHeight;
+                        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                        const imageData = canvas.toDataURL('image/jpeg');
+                        socket.emit('video_data', { imageData });
+                    }
+                    // Send data every 200 milliseconds
+                    setInterval(sendData, 200);
+                };
+            })
+            .catch(error => {
+                console.error("Camera access denied:", error);
+            });
+
+        // Listen for processed data from the server
+        socket.on('processed_video_data', data => {
+            // Render the processed frame
+            const canvas = document.createElement('canvas');
+            canvas.width = data.processedImageData.width;
+            canvas.height = data.processedImageData.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(data.processedImageData, 0, 0);
+            document.body.appendChild(canvas);
+        });
+    </script>
+</body>
+
+</html>

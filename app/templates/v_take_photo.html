@@ -1,0 +1,137 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<form id="frmPeoplePhoto" enctype="multipart/form-data">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{ title }}</h4>
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            Cédula: <b>{{ person_data.dni }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Persona: <b>{{ person_data.names }} {{ person_data.lastnames }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Sexo: <b>{{ "MASCULINO" if person_data.gender=='M' else 'FEMENINO' }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Edad: <b>{{ person_data.age | calcular_edad }} años</b>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="d-grid gap-2">
+                                <button type="button" name="captureBtn" id="captureBtn" class="btn btn-primary">
+                                    Capturar Foto
+                                </button>
+                                <button type="button" id="retakeBtn" class="btn btn-secondary" style="display: none;">
+                                    Volver a Tomar Foto
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <video id="video" width="640" height="480" autoplay></video>
+                            <input type="image" class="form-control" id="capturedImage" name="capturedImage" style="display:none;"
+                                width="640" height="480">
+                        </div>
+                    </div>
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 offset-md-3">
+                            <div class="d-grid gap-2">
+                                <button type="submit" name="btnGuardarDatos" id="btnGuardarDatos"
+                                    class="btn btn-primary">
+                                    Guardar Datos
+                                </button>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</form>
+{% endblock %}
+{% block scripts %}
+<script>
+    let imageData = null; 
+    document.addEventListener('DOMContentLoaded', function () {
+        const video = document.getElementById('video');
+        const captureBtn = document.getElementById('captureBtn');
+        const capturedImage = document.getElementById('capturedImage');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (error) {
+                console.error('Error accessing the camera: ', error);
+            });
+
+        captureBtn.addEventListener('click', function () {
+            video.setAttribute("hidden", true);
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert canvas to data URL
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            imageData = dataURItoBlob(dataUrl);
+
+            // Set data URL as the source for the capturedImage input
+            capturedImage.src = dataUrl;
+            capturedImage.style.display = 'block';
+
+            // Optionally, you can send the dataUrl to the server using AJAX if needed
+
+            // Stop the video stream
+            const stream = video.srcObject;
+            const tracks = stream.getTracks();
+            tracks.forEach(track => track.stop());
+            video.srcObject = null;
+            retakeBtn.style.display = 'block';
+        });
+    });
+    retakeBtn.addEventListener('click', function () {
+        window.location.reload()
+    });
+    var frmPeoplePhoto = document.querySelector("#frmPeoplePhoto");
+    frmPeoplePhoto.addEventListener('submit', (e) => {
+        e.preventDefault();
+        var formData = new FormData(frmPeoplePhoto);
+        formData.append('capturedImage', imageData, 'captured_photo.jpg');
+        axios.post("{{ url_for('people.register_person_photo', dni=person_data.dni ) }}", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['correcto'] != '') {
+                    generarMensajeCorrecto(mensajes);
+                }
+                if (mensajes['error'] != '') {
+                    generarMensajeError(mensajes);
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            })
+    });
+
+    function dataURItoBlob(dataURI) {
+            const byteString = atob(dataURI.split(',')[1]);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) {
+                ia[i] = byteString.charCodeAt(i);
+            }
+            return new Blob([ab], { type: 'image/jpeg' });
+        }
+</script>
+{% endblock %}

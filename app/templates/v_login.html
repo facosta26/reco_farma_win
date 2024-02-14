@@ -1,0 +1,100 @@
+{% extends 'v_master.html' %}
+{% block login %}
+<style>
+    .login-form {
+        padding-top: 20%;
+    }
+
+    .card-body {
+        border: 1px solid transparent;
+        border-radius: 5px;
+        background-color: white;
+    }
+
+    img.img-fluid {
+        width: 100%;
+        object-fit: cover;
+    }
+
+    #bodyLogin {
+        margin-top: 5vh;
+    }
+
+    @media (max-width: 768px) {
+        #bodyLogin {
+            margin-top: -80px;
+        }
+        .login-form {
+        padding-top: 50px;
+    }
+    }
+</style>
+
+<div class="row" id="bodyLogin">
+    <div class="col-md-6 offset-md-3">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <img class="img-fluid" src="{{ url_for('static', filename='img/fondo2.png') }}" alt="">
+                </div>
+                <div class="col-md-6">
+                    <form id="frmLogin" novalidate>
+                        <div class="container col-md-11 login-form">
+                            {% if error %}
+                            <div class="alert alert-danger">{{ error }}</div>
+                            {% endif %}
+                            <h4 class="text-center">Ingrese sus credenciales</h4>
+                            <div class="form-floating mb-3">
+                                {{ form.txtUsuario(class="form-control", placeholder="Ingrese su usuario") }}
+                                <label for="txtUsuario">Usuario</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                {{ form.txtPassword(class="form-control", placeholder="Ingrese su usuario") }}
+                                <label for="txtPassword">Contraseña</label>
+                            </div>
+                            {{ form.hidden_tag() }}
+                            <div class="d-grid gap-2 mb-3">
+                                <button type="submit" class="btn btn-primary btn-lg">Ingresar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block scripts %}
+    <script>
+        axios.defaults.headers.common['X-CSRFToken'] = csrfToken;
+        var frmLogin = document.querySelector("#frmLogin");
+        frmLogin.addEventListener('submit', (e)=>{
+            e.preventDefault();
+            var formData = new FormData(frmLogin);
+            axios.post("{{ url_for('login.process_user_credentials' ) }}", formData)
+            .then(function (response) {
+                var mensajes = response.data;
+                if (mensajes['correcto'] != '') {
+                    window.location.href = "{{ url_for('login.principal' ) }}";
+                }
+                if (mensajes['error'] != '') {
+                    generarMensajeError(mensajes);
+                }
+
+            })
+            .catch(function (error) {
+                error
+            })
+        });
+    </script>
+{% endblock %}

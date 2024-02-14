@@ -1,0 +1,82 @@
+{% extends 'v_master.html' %}
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">{{Title}}</h4>
+                    <div class="row">
+                        <div class="col-md-12 mb-3 text-center">
+                            <img class="img-fluid img-thumbnail" src="{{ url_for('static', filename='uploads/people_photo') }}/{{ photo.peph_path }}" style="height: 200px">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Cédula: <b>{{ consultations.dni }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Persona: <b>{{ consultations.patient }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Sexo: <b>{{ "MASCULINO" if consultations.gender=='M' else 'FEMENINO' }}</b>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            Edad: <b>{{ consultations.birthdate | calcular_edad }} años</b>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <h4 class="text-center">Datos de la Consulta</h4>
+                                    <p>Médico: <b>{{ consultations.doctor }}</b></p>
+                                    <p>Diagnóstico: <b>{{ consultations.diagnostic }}</b></p>
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div
+                                                class="table-responsive"
+                                            >
+                                                <table
+                                                    class="table table-striped table-borderless align-middle"
+                                                >
+                                                    <thead class="table-light">
+                                                        <h6>
+                                                            Medicamentos Recetados
+                                                        </h6>
+                                                        <tr>
+                                                            <th>Medicamento</th>
+                                                            <th>Indicaciones</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody class="">
+                                                        {% if medications %}
+                                                            {% for m in medications %}
+                                                                <tr>
+                                                                    <td>
+                                                                        {{ m.prde_medicine }}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ m.prde_medical_indications }}
+                                                                    </td>
+                                                                </tr>
+                                                            {% endfor %}
+                                                        {% else %}
+                                                            <tr>
+                                                                <td colspan="2" class="text-center"><h4>No hay medicamentos recetados</h4></td>
+                                                            </tr>
+                                                        {% endif %}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+{% endblock %}

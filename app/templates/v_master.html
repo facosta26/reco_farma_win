@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>RECO FARMA | {{ title }}</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/fondo1.png' ) }}" type="image/x-icon">
+    <!-- Bootstrap CSS v5.2.1 -->
+    <link href="{{ url_for('static', filename='bootstrap.min.css' ) }}" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css"
+        href="{{ url_for('static', filename='node_modules/jquery-confirm/dist/jquery-confirm.min.css' ) }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='fontawesome/css/all.min.css' ) }}">
+    <style>
+        body {
+            background-color: #e4ddd4;
+            padding-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    {% if 'logged' in session %}
+        <header>
+            <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+                <div class="container-fluid">
+                    <a class="navbar-brand" href="{{ url_for('login.index' ) }}"><img width="60" class="d-inline-block align-text-top" src="{{ url_for('static', filename='img/fondo1.png') }}" alt="" srcset=""></a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+                        aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarText">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="{{ url_for('login.index' ) }}"><i class="fa fa-home" aria-hidden="true"></i> Inicio</a>
+                            </li>
+                           <!--  <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('usuarios.users' ) }}">Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('people.people' ) }}">Personas</a>
+                            </li> -->
+                        </ul>
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('logout' ) }}"><i class="fa fa-close" aria-hidden="true"></i> Cerrar Sesión</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    {% endif %}
+    <main>
+        <div class="container-fluid">
+            {% block login %}
+
+            {% endblock %}
+        </div>
+        <div class="container mt-3">
+            <div class="row">
+                <div class="col-md-12">
+                    {% block content %}
+
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <!-- place footer here -->
+    </footer>
+    <!-- Bootstrap JavaScript Libraries -->
+    <script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js' ) }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/jquery/dist/jquery.min.js' ) }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/jquery-confirm/dist/jquery-confirm.min.js' ) }}"></script>
+    <script src="{{ url_for('static', filename='node_modules/axios/dist/axios.min.js' ) }}"></script>
+    <script src="{{ url_for('static', filename='fontawesome/js/all.min.js' ) }}"></script>
+    <script>
+        var csrfToken = document.querySelector("[name='csrf_token']").value;
+        function axiosConfig() {
+                return {
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                };
+            }
+        function generarMensajeCorrecto(mensajes, llamarFuncion = false) {
+            $.confirm({
+                title: 'Correcto',
+                content: mensajes['correcto'],
+                type: 'green',
+                buttons: {
+                    aceptar: {
+                        text: 'Aceptar',
+                        btnClass: 'btn btn-success',
+                        action: function () {
+                            if (llamarFuncion != false) {
+                                llamarFuncion();
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        function generarMensajeAlerta(mensajes, llamarFuncion = false) {
+                $.confirm({
+                    title: 'Alerta',
+                    content: mensajes['alerta'],
+                    type: 'orange',
+                    buttons: {
+                        aceptar: {
+                            text: 'Aceptar',
+                            btnClass: 'btn btn-success',
+                            action: function () {
+                                if (llamarFuncion != false) {
+                                    llamarFuncion();
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        function generarMensajeError(mensajes) {
+            // Si hay errores de validación, muestra los mensajes de error
+            if (mensajes.error.validacion) {
+                const errores = mensajes.error.detalles;
+                let mensajeError = mensajes.error.validacion + '\n';
+
+                for (const campo in errores) {
+                    if (errores.hasOwnProperty(campo)) {
+                        mensajeError += `${errores[campo]}\n`;
+                    }
+                }
+                $.dialog({
+                    title: 'Error!',
+                    type: 'red',
+                    content: mensajeError,
+                });
+            } else {
+                $.dialog({
+                    title: 'Error!',
+                    type: 'red',
+                    content: mensajes.error,
+                });
+            }
+
+        }
+    </script>
+    {% block scripts %}
+
+    {% endblock %}
+</body>
+
+</html>

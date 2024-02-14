@@ -1,0 +1,276 @@
+{% extends 'v_master.html' %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">{{ title }}</h4>
+                <!-- Nav tabs -->
+                <ul class="nav nav-tabs" id="tabEstadistico" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="doctores-tab" data-bs-toggle="tab"
+                            data-bs-target="#doctores" type="button" role="tab" aria-controls="doctores"
+                            aria-selected="true">
+                            Doctores
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="usuarios-tab" data-bs-toggle="tab" data-bs-target="#usuarios"
+                            type="button" role="tab" aria-controls="usuarios" aria-selected="false">
+                            Usuarios
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="personas-tab" data-bs-toggle="tab" data-bs-target="#personas"
+                            type="button" role="tab" aria-controls="personas" aria-selected="false">
+                            Personas
+                        </button>
+                    </li>
+                </ul>
+
+                <!-- Tab panes -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="doctores" role="tabpanel" aria-labelledby="doctores-tab">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Cantidad Total de Médicos: <b id="total_medicos">0</b>
+                                        </h5>
+                                        <canvas id="doctor-quantity" style="height: 100px;"></canvas>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Cantidad de Médicos por Especialidad (Activos):</h5>
+                                        <canvas id="doctor-quantity-especialties" style="height: 200px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="usuarios" role="tabpanel" aria-labelledby="usuarios-tab">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Cantidad Total de Usuarios: <b id="total_usuarios">0</b>
+                                        </h5>
+                                        <canvas id="user-quantity" style="height: 100px;"></canvas>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Cantidad de Usuarios por Roles (Activos):</h5>
+                                        <canvas id="user-quantity-role" style="height: 200px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="personas" role="tabpanel" aria-labelledby="personas-tab">
+                        <div class="card border-primary">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="card-title">Cantidad Total de Personas: <b id="total_personas">0</b>
+                                        </h5>
+                                        <h5 class="card-title">Cantidad de Personas por Sexo:</h5>
+                                    </div>
+                                    <div class="col-md-6 offset-md-3">
+                                        <canvas id="people-quantity-gender" style="height: 200px;"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='node_modules/chart.js/dist/chart.umd.js') }}"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const chartCanvasDQ = document.getElementById("doctor-quantity");
+        if (!chartCanvasDQ) {
+            console.error("No se encontró el elemento canvas.");
+            return;
+        }
+
+        const ctxdq = chartCanvasDQ.getContext("2d");
+        if (!ctxdq) {
+            console.error("No se pudo obtener el contexto de renderizado del canvas.");
+            return;
+        }
+
+        const chartdq = new Chart(ctxdq, {
+            type: "doughnut",
+            data: {
+                labels: ["Inactivos", "Activos"],
+                datasets: [{
+                    label: "Estado de Médicos",
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                    ],
+                }],
+            },
+        });
+
+        fetch("{{ url_for('report.doctor_quantity' ) }}")
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById('total_medicos').innerText = data.quantity_inactive + data.quantity_active;
+                chartdq.data.datasets[0].data = [data.quantity_inactive, data.quantity_active];
+                chartdq.update();
+            });
+
+        const chartCanvasDQE = document.getElementById("doctor-quantity-especialties");
+        if (!chartCanvasDQE) {
+            console.error("No se encontró el elemento canvas.");
+            return;
+        }
+
+        const ctxdqe = chartCanvasDQE.getContext("2d");
+        if (!ctxdqe) {
+            console.error("No se pudo obtener el contexto de renderizado del canvas.");
+            return;
+        }
+
+        const chartdqe = new Chart(ctxdqe, {
+            type: "bar",
+            data: {
+                labels: ["Inactivos", "Activos"],
+                datasets: [{
+                    label: "Médicos con Especialidad",
+
+                }],
+            },
+        });
+
+        fetch("{{ url_for('report.doctor_quantity_especialties' ) }}")
+            .then((response) => response.json())
+            .then((data) => {
+                var especialties = [];
+                for (var i = 0; i < data[0]['especialties'].length; i++) {
+                    especialties.push(data[0]['especialties'][i]['especialty']);
+                }
+                chartdqe.data.labels = especialties;
+                var doctors = [];
+                for (var i = 0; i < data[0]['doctors'].length; i++) {
+                    doctors.push(data[0]['doctors'][i]['quantity']);
+                }
+                chartdqe.data.datasets[0].data = doctors;
+                chartdqe.update();
+            });
+
+        const chartCanvasUQ = document.getElementById("user-quantity");
+        if (!chartCanvasUQ) {
+            console.error("No se encontró el elemento canvas.");
+            return;
+        }
+
+        const ctxUQ = chartCanvasUQ.getContext("2d");
+        if (!ctxUQ) {
+            console.error("No se pudo obtener el contexto de renderizado del canvas.");
+            return;
+        }
+
+        const chartUQ = new Chart(ctxUQ, {
+            type: "doughnut",
+            data: {
+                labels: ["Inactivos", "Activos"],
+                datasets: [{
+                    label: "Estado de Médicos",
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                    ],
+                }],
+            },
+        });
+
+        fetch("{{ url_for('report.user_quantity' ) }}")
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById('total_usuarios').innerText = data.quantity_inactive + data.quantity_active;
+                chartUQ.data.datasets[0].data = [data.quantity_inactive, data.quantity_active];
+                chartUQ.update();
+            });
+
+        const chartCanvasUQR = document.getElementById("user-quantity-role");
+        if (!chartCanvasUQR) {
+            console.error("No se encontró el elemento canvas.");
+            return;
+        }
+
+        const ctxuqr = chartCanvasUQR.getContext("2d");
+        if (!ctxuqr) {
+            console.error("No se pudo obtener el contexto de renderizado del canvas.");
+            return;
+        }
+
+        const chartuqr = new Chart(ctxuqr, {
+            type: "bar",
+            data: {
+                labels: ["Inactivos", "Activos"],
+                datasets: [{
+                    label: "Roles de Usuarios",
+
+                }],
+            },
+        });
+
+
+        fetch("{{ url_for('report.user_quantity_role' ) }}")
+            .then((response) => response.json())
+            .then((data) => {
+                var role = [];
+                for (var i = 0; i < data[0]['roles'].length; i++) {
+                    role.push(data[0]['roles'][i]['role']);
+                }
+                chartuqr.data.labels = role;
+                var users = [];
+                for (var i = 0; i < data[0]['users'].length; i++) {
+                    users.push(data[0]['users'][i]['quantity']);
+                }
+                chartuqr.data.datasets[0].data = users;
+                chartuqr.update();
+            });
+
+        const chartCanvasPQ = document.getElementById("people-quantity-gender");
+        if (!chartCanvasPQ) {
+            console.error("No se encontró el elemento canvas.");
+            return;
+        }
+
+        const ctxpq = chartCanvasPQ.getContext("2d");
+        if (!ctxpq) {
+            console.error("No se pudo obtener el contexto de renderizado del canvas.");
+            return;
+        }
+
+        const chartpq = new Chart(ctxpq, {
+            type: "doughnut",
+            data: {
+                labels: ["Masculinos", "Femeninos"],
+                datasets: [{
+                    label: "Sexo de Personas",
+                    backgroundColor: [
+                        'rgb(255, 99, 132)',
+                        'rgb(54, 162, 235)',
+                    ],
+                }],
+            },
+        });
+
+        fetch("{{ url_for('report.people_quantity_gender' ) }}")
+            .then((response) => response.json())
+            .then((data) => {
+                document.getElementById('total_personas').innerText = data[0]['genders'][0].quantity + data[0]['genders'][1].quantity;
+                chartpq.data.datasets[0].data = [data[0]['genders'][0].quantity, data[0]['genders'][1].quantity];
+                chartpq.update();
+            });
+    });
+</script>
+{% endblock %}
